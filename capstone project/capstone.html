@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopEase</title>
+<style>
+:root{--p:#1f4f8b;--s:#f5a623;--bg:#f6f8fb;--c:#fff;--t:#2b2b2b;--m:#707070;font-family:sans-serif}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--t)}
+header{display:flex;justify-content:space-between;padding:15px;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0}
+a{margin-left:15px;color:var(--m);text-decoration:none}
+button{cursor:pointer;border:none;border-radius:10px;padding:10px}
+.btn{background:var(--p);color:#fff}
+.add{background:var(--s)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;padding:20px}
+.card{background:var(--c);border-radius:15px;overflow:hidden;box-shadow:0 10px 25px #0001}
+.card img{width:100%}
+.info{padding:12px;display:flex;flex-direction:column;gap:8px}
+.meta{display:flex;justify-content:space-between;align-items:center}
+.cart{position:fixed;bottom:20px;right:20px;width:280px;background:#fff;border-radius:15px;box-shadow:0 10px 30px #0003;transform:translateY(120%);transition:.3s}
+.cart.active{transform:translateY(0)}
+.cart h3{background:var(--p);color:#fff;padding:10px;border-radius:15px 15px 0 0}
+.cart div{padding:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <b>ShopEase</b>
+  <div>
+    <a href="#">Products</a>
+    <button class="btn" id="toggle">Cart (<span id="count">0</span>)</button>
+  </div>
+</header>
+
+<div class="grid" id="products"></div>
+
+<div class="cart" id="cart">
+  <h3>Cart</h3>
+  <div id="items">Empty</div>
+  <div>Total: $<span id="total">0</span></div>
+  <button class="add" id="checkout">Checkout</button>
+</div>
+
+<script>
+const data=[
+{id:1,n:"Headphones",p:89,img:"https://picsum.photos/300?1"},
+{id:2,n:"Watch",p:120,img:"https://picsum.photos/300?2"},
+{id:3,n:"Speaker",p:59,img:"https://picsum.photos/300?3"},
+{id:4,n:"Backpack",p:75,img:"https://picsum.photos/300?4"}
+];
+
+const grid=document.getElementById("products"),
+cart={},itemsEl=document.getElementById("items"),
+countEl=document.getElementById("count"),totalEl=document.getElementById("total");
+
+grid.innerHTML=data.map(p=>`
+<div class="card">
+<img src="${p.img}">
+<div class="info">
+<b>${p.n}</b>
+<div class="meta">
+<span>$${p.p}</span>
+<button class="add" onclick="add(${p.id})">Add</button>
+</div>
+</div>
+</div>`).join("");
+
+function add(id){
+let p=data.find(x=>x.id==id);
+cart[id]=(cart[id]||{...p,q:0});
+cart[id].q++;
+update();
+}
+
+function update(){
+let arr=Object.values(cart);
+itemsEl.innerHTML=arr.length?arr.map(i=>`${i.n} x${i.q}`).join("<br>"):"Empty";
+countEl.textContent=arr.reduce((a,b)=>a+b.q,0);
+totalEl.textContent=arr.reduce((a,b)=>a+b.q*b.p,0);
+}
+
+document.getElementById("toggle").onclick=()=>cartEl.classList.toggle("active");
+const cartEl=document.getElementById("cart");
+
+document.getElementById("checkout").onclick=()=>{
+if(!Object.keys(cart).length)return alert("Empty");
+alert("Done!");
+Object.keys(cart).forEach(k=>delete cart[k]);
+update();
+};
+</script>
+
+</body>
+</html>
